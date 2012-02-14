@@ -15,30 +15,32 @@ classdef DriverTimer < handle
             disp('created timer');
             TMR.delay=delay;
         end
-        function set_delay(TMR,delay)
+        function setDelay(TMR,delay)
             disp('set delay');
             TMR.delay=delay;
         end
-        function activate_timer(TMR)
+        function activateTimer(TMR)
            if strcmp(TMR.state,'off')
                TMR.tmr=timer('TimerFcn',@(x,y)TMR.callback(),'Period',TMR.delay,'ExecutionMode','fixeddelay');
                start(TMR.tmr);
                TMR.state='on';
            end
         end
-        function deactivate_timer(TMR)
+        function deactivateTimer(TMR)
             if strcmp(TMR.state,'on')
                stop(TMR.tmr);
                delete(TMR.tmr);
                TMR.state='off';
             end
         end
-        function add_timer_listener(DRV_pub,LST_sub,tmr_evt)
+        function addTimerListener(publisher,subscriber,tmrEvent)
             disp('add timer listener');
-            addlistener(DRV_pub, tmr_evt, @(evt_src,evt_data)timer_event_occured(LST_sub,evt_src,evt_data)); 
+            addlistener(publisher, tmrEvent, @(evtSource,evtData)timerEvent(subscriber,evtSource,evtData)); 
         end
         function callback(TMR)
+            %disp('Timer went off');
             notify(TMR,'TimerPulsed');
+            %disp('Timer nofify sent');
         end
         
     end

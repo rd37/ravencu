@@ -10,7 +10,7 @@ classdef TestDriver < handle
         function TD=TestDriver(id)
             TD.id=id;
         end
-        function driver_event_occured(sub,pub,evt_obj)
+        function driverEventOccured(sub,pub,evt_obj)
            disp('recieved event'); 
         end
     end

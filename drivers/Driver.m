@@ -1,72 +1,65 @@
 classdef Driver < handle
     %DRIVER Summary of this class goes here
     %   Detailed explanation goes here
-    
-    properties
+    properties (Access=protected)
         address=0;
+        connection;
         timer;
-        serial_obj;
-        
-        comport='Com5';
-        baud_rate=115200;
-        data_bits=8;
-        parity='none';
-        stop_bits=1;
-        flow_control='none';
     end
     
     methods
         %driver constructor called by sub class
-        function DRV=Driver(address,comport,baud_rate)
-            DRV.address=address;
-            DRV.comport=comport;
-            DRV.baud_rate=baud_rate;
+        function driver=Driver(address,connection)
+            driver.address=address;
+            driver.connection=connection;
         end
         
-        function set_timer(DRV, interval)
+        function setTimer(driver, interval)
             %same in java if timer!=null 
-            if ~isempty(DRV.timer)
+            if ~isempty(driver.timer)
                 disp('update timer');
-                DRV.timer.set_delay(interval);
+                driver.timer.setDelay(interval);
             else
                 disp('create new timer');
-                DRV.timer=DriverTimer(interval);
-                add_timer_listener(DRV.timer,DRV,'TimerPulsed');
+                driver.timer=DriverTimer(interval);
+                addTimerListener(driver.timer,driver,'TimerPulsed');
             end
         end
         
-        function activate_timer(DRV)
-            if ~isempty(DRV.timer)
+        function activateTimer(driver)
+            if ~isempty(driver.timer)
                disp('activate timer');
-               activate_timer(DRV.timer);
+               activateTimer(driver.timer);
             end
         end
         
-        function deactivate_timer(DRV)
-            if ~isempty(DRV.timer)
+        function deactivateTimer(driver)
+            if ~isempty(driver.timer)
                 disp('deactivate timer');
-               deactivate_timer(DRV.timer);
+               deactivateTimer(driver.timer);
             end
         end
         
-        function add_driver_listener(DRV_pub,LST_sub,drv_evt)
+        function addDriverListener(publisher,subscriber,drvEvent)
             disp('add driver listener');
-            addlistener(DRV_pub, drv_evt, @(evt_src,evt_data)driver_event_occured(LST_sub,evt_src,evt_data)); 
+            addlistener(publisher, drvEvent, @(evtSource,evtData)driverEventOccured(subscriber,evtSource,evtData)); 
         end
         
-        function destroy(DRV)
+        function destroy(driver)
             disp('destroy this driver');
-             if ~isempty(DRV.timer)
-                 deactivate_timer(DRV.timer);
+             if ~isempty(driver.timer)
+                 deactivateTimer(driver.timer);
                  %clear(DRV.timer);
              end
-             fclose(DRV.serial_obj);
+             fclose(driver.serial_connection);
              clear DRV;
         end
     end
     
     methods (Abstract)
-        result=timer_event_occured(evt_sub, evt_pub, evt_data);
+        move( obj, value, interval );
+        findRef( obj );
+        result=timerEvent(subscriber, publisher, evtData);
     end
     
 end
